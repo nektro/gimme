@@ -12,27 +12,27 @@ pub fn allocator() std.mem.Allocator {
     };
 }
 
-fn alloc(ctx: *anyopaque, n: usize, log2_ptr_align: u8, ret_addr: usize) ?[*]u8 {
+fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
     _ = ctx;
-    _ = n;
-    _ = log2_ptr_align;
+    _ = len;
+    _ = ptr_align;
     _ = ret_addr;
     return null;
 }
 
-fn resize(ctx: *anyopaque, buf: []u8, log2_buf_align: u8, new_len: usize, ret_addr: usize) bool {
+fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: usize) bool {
     _ = ctx;
     _ = buf;
-    _ = log2_buf_align;
+    _ = buf_align;
     _ = new_len;
     _ = ret_addr;
     return false;
 }
 
-fn free(ctx: *anyopaque, buf: []u8, log2_buf_align: u8, ret_addr: usize) void {
+fn free(ctx: *anyopaque, buf: []u8, buf_align: u8, ret_addr: usize) void {
     _ = ctx;
     _ = buf;
-    _ = log2_buf_align;
+    _ = buf_align;
     _ = ret_addr;
     return {};
 }
