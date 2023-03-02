@@ -4,3 +4,4 @@ main: src/lib.zig
 license: MIT
 description: A yummy collection of useful Allocators
 dependencies:
+  - src: git https://github.com/nektro/zig-extras
