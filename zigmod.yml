@@ -1,0 +1,6 @@
+id: ag273cr815rh1ncntvnjaf1x8rs1xl7v1v7r5aczudxa50nm
+name: gimme
+main: src/lib.zig
+license: MIT
+description: A yummy collection of useful Allocators
+dependencies:
