@@ -4,4 +4,5 @@ test {
     _ = gimme.FailingAllocator;
     _ = gimme.CountingAllocator;
     _ = gimme.LivenessAllocator;
+    _ = gimme.ZeroAllocator;
 }
