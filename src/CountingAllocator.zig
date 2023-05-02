@@ -33,7 +33,10 @@ fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
 fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: usize) bool {
     var self = extras.ptrCast(CountingAllocator, ctx);
     const stable = self.child_allocator.rawResize(buf, buf_align, new_len, ret_addr);
-    if (!stable) self.count += new_len;
+    if (!stable) {
+        self.count -= buf.len;
+        self.count += new_len;
+    }
     return stable;
 }
 
