@@ -24,14 +24,14 @@ pub fn allocator(self: *ZeroAllocator) std.mem.Allocator {
 fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
     var self = extras.ptrCast(ZeroAllocator, ctx);
     const ptr = self.child_allocator.rawAlloc(len, ptr_align, ret_addr) orelse return null;
-    @memset(ptr, 0, len);
+    @memset(ptr[0..len], 0);
     return ptr;
 }
 
 fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: usize) bool {
     var self = extras.ptrCast(ZeroAllocator, ctx);
     const stable = self.child_allocator.rawResize(buf, buf_align, new_len, ret_addr);
-    if (!stable) @memset(buf.ptr, 0, new_len);
+    if (!stable) @memset(buf, 0);
     return stable;
 }
 
