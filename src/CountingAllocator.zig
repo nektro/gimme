@@ -6,6 +6,9 @@ child_allocator: std.mem.Allocator,
 count_active: u64,
 count_active_strict: u64,
 count_total: u64,
+count_allocs: u64,
+count_resizes: u64,
+count_frees: u64,
 
 pub fn init(child_allocator: std.mem.Allocator) CountingAllocator {
     return .{
@@ -13,6 +16,9 @@ pub fn init(child_allocator: std.mem.Allocator) CountingAllocator {
         .count_active = 0,
         .count_active_strict = 0,
         .count_total = 0,
+        .count_allocs = 0,
+        .count_resizes = 0,
+        .count_frees = 0,
     };
 }
 
@@ -29,6 +35,7 @@ pub fn allocator(self: *CountingAllocator) std.mem.Allocator {
 
 fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
     var self = extras.ptrCast(CountingAllocator, ctx);
+    self.count_allocs += 1;
     const ptr = self.child_allocator.rawAlloc(len, ptr_align, ret_addr) orelse return null;
     self.count_active += len;
     self.count_total += len;
@@ -37,6 +44,7 @@ fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
 
 fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: usize) bool {
     var self = extras.ptrCast(CountingAllocator, ctx);
+    self.count_resizes += 1;
     const old_len = buf.len;
     const stable = self.child_allocator.rawResize(buf, buf_align, new_len, ret_addr);
     self.count_active += new_len;
@@ -51,6 +59,7 @@ fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: u
 
 fn free(ctx: *anyopaque, buf: []u8, buf_align: u8, ret_addr: usize) void {
     var self = extras.ptrCast(CountingAllocator, ctx);
+    self.count_frees += 1;
     self.count_active -= buf.len;
     return self.child_allocator.rawFree(buf, buf_align, ret_addr);
 }
