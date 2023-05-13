@@ -38,6 +38,7 @@ fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
     self.count_allocs += 1;
     const ptr = self.child_allocator.rawAlloc(len, ptr_align, ret_addr) orelse return null;
     self.count_active += len;
+    self.count_active_strict += len;
     self.count_total += len;
     return ptr;
 }
@@ -61,5 +62,6 @@ fn free(ctx: *anyopaque, buf: []u8, buf_align: u8, ret_addr: usize) void {
     var self = extras.ptrCast(CountingAllocator, ctx);
     self.count_frees += 1;
     self.count_active -= buf.len;
+    self.count_active_strict -= buf.len;
     return self.child_allocator.rawFree(buf, buf_align, ret_addr);
 }
