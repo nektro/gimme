@@ -6,6 +6,7 @@ child_allocator: std.mem.Allocator,
 count_active: u64,
 count_total: u64,
 count_allocs: u64,
+count_allocs_success: u64,
 count_resizes: u64,
 count_frees: u64,
 
@@ -15,6 +16,7 @@ pub fn init(child_allocator: std.mem.Allocator) CountingAllocator {
         .count_active = 0,
         .count_total = 0,
         .count_allocs = 0,
+        .count_allocs_success = 0,
         .count_resizes = 0,
         .count_frees = 0,
     };
@@ -35,6 +37,7 @@ fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
     var self = extras.ptrCast(CountingAllocator, ctx);
     self.count_allocs += 1;
     const ptr = self.child_allocator.rawAlloc(len, ptr_align, ret_addr) orelse return null;
+    self.count_allocs_success += 1;
     self.count_active += len;
     self.count_total += len;
     return ptr;
