@@ -42,7 +42,7 @@ fn free(ctx: *anyopaque, buf: []u8, buf_align: u8, ret_addr: usize) void {
 
 test ZeroAllocator {
     {
-        var a = try std.testing.allocator.alloc(usize, 1);
+        const a = try std.testing.allocator.alloc(usize, 1);
         defer std.testing.allocator.free(a);
         try std.testing.expect(a[0] == undefined);
     }
@@ -50,7 +50,7 @@ test ZeroAllocator {
         var z = ZeroAllocator.init(std.testing.allocator);
         const l = z.allocator();
 
-        var a = try l.alloc(usize, 1);
+        const a = try l.alloc(usize, 1);
         defer l.free(a);
         try std.testing.expect(a[0] == undefined);
     }
