@@ -28,12 +28,13 @@ pub fn allocator(self: *CountingAllocator) std.mem.Allocator {
         .vtable = &.{
             .alloc = alloc,
             .resize = resize,
+            .remap = remap,
             .free = free,
         },
     };
 }
 
-fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
+fn alloc(ctx: *anyopaque, len: usize, ptr_align: std.mem.Alignment, ret_addr: usize) ?[*]u8 {
     var self = extras.ptrCast(CountingAllocator, ctx);
     self.count_allocs += 1;
     const ptr = self.child_allocator.rawAlloc(len, ptr_align, ret_addr) orelse return null;
@@ -43,7 +44,7 @@ fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
     return ptr;
 }
 
-fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: usize) bool {
+fn resize(ctx: *anyopaque, buf: []u8, buf_align: std.mem.Alignment, new_len: usize, ret_addr: usize) bool {
     var self = extras.ptrCast(CountingAllocator, ctx);
     self.count_resizes += 1;
     const old_len = buf.len;
@@ -64,7 +65,17 @@ fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: u
     return stable;
 }
 
-fn free(ctx: *anyopaque, buf: []u8, buf_align: u8, ret_addr: usize) void {
+fn remap(ctx: *anyopaque, memory: []u8, alignment: std.mem.Alignment, new_len: usize, ret_addr: usize) ?[*]u8 {
+    var self = extras.ptrCast(CountingAllocator, ctx);
+    const memory_new = self.child_allocator.rawRemap(memory, alignment, new_len, ret_addr) orelse return null;
+    if (memory_new != memory.ptr) self.count_active -= memory.len;
+    if (memory_new != memory.ptr) self.count_active += new_len;
+    if (memory_new != memory.ptr) self.count_total -= memory.len;
+    if (memory_new != memory.ptr) self.count_total += new_len;
+    return memory_new;
+}
+
+fn free(ctx: *anyopaque, buf: []u8, buf_align: std.mem.Alignment, ret_addr: usize) void {
     var self = extras.ptrCast(CountingAllocator, ctx);
     self.count_frees += 1;
     self.count_active -= buf.len;

@@ -1,8 +1,9 @@
+const std = @import("std");
 const gimme = @import("gimme");
 
 test {
-    _ = gimme.FailingAllocator;
-    _ = gimme.CountingAllocator;
-    _ = gimme.LivenessAllocator;
-    _ = gimme.ZeroAllocator;
+    std.testing.refAllDecls(gimme.FailingAllocator);
+    std.testing.refAllDecls(gimme.CountingAllocator);
+    std.testing.refAllDecls(gimme.LivenessAllocator);
+    std.testing.refAllDecls(gimme.ZeroAllocator);
 }
