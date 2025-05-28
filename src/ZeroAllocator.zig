@@ -1,6 +1,5 @@
 const std = @import("std");
 const ZeroAllocator = @This();
-const extras = @import("extras");
 
 child_allocator: std.mem.Allocator,
 

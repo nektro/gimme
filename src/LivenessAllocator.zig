@@ -1,6 +1,5 @@
 const std = @import("std");
 const LivenessAllocator = @This();
-const extras = @import("extras");
 
 child_allocator: std.mem.Allocator,
 count: u64,

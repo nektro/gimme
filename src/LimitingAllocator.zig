@@ -1,6 +1,5 @@
 const std = @import("std");
 const LimitingAllocator = @This();
-const extras = @import("extras");
 const gimme = @import("./lib.zig");
 
 counter: gimme.CountingAllocator,

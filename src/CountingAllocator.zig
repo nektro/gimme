@@ -1,6 +1,5 @@
 const std = @import("std");
 const CountingAllocator = @This();
-const extras = @import("extras");
 
 child_allocator: std.mem.Allocator,
 count_active: u64,
