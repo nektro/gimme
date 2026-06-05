@@ -16,6 +16,7 @@ pub fn build(b: *std.Build) void {
     deps.addAllTo(exe_tests);
     exe_tests.use_llvm = !disable_llvm;
     exe_tests.use_lld = !disable_llvm;
+    b.getInstallStep().dependOn(&exe_tests.step);
 
     const tests_run = b.addRunArtifact(exe_tests);
     tests_run.setCwd(b.path("."));
