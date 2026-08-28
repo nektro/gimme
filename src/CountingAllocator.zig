@@ -5,6 +5,7 @@ child_allocator: std.mem.Allocator,
 count_active: u64,
 count_allocs: u64,
 count_resizes: u64,
+count_remaps: u64,
 count_frees: u64,
 
 pub fn init(child_allocator: std.mem.Allocator) CountingAllocator {
@@ -13,6 +14,7 @@ pub fn init(child_allocator: std.mem.Allocator) CountingAllocator {
         .count_active = 0,
         .count_allocs = 0,
         .count_resizes = 0,
+        .count_remaps = 0,
         .count_frees = 0,
     };
 }
@@ -41,24 +43,17 @@ fn resize(ctx: *anyopaque, buf: []u8, buf_align: std.mem.Alignment, new_len: usi
     var self: *CountingAllocator = @ptrCast(@alignCast(ctx));
     self.count_resizes += 1;
     const old_len = buf.len;
-    const stable = self.child_allocator.rawResize(buf, buf_align, new_len, ret_addr);
-    if (stable) {
-        if (new_len > old_len) {
-            self.count_active += new_len;
-            self.count_active -= old_len;
-        } else {
-            self.count_active -= old_len;
-            self.count_active += new_len;
-        }
-    }
-    return stable;
+    self.count_active -= old_len;
+    self.count_active += new_len;
+    return self.child_allocator.rawResize(buf, buf_align, new_len, ret_addr);
 }
 
 fn remap(ctx: *anyopaque, memory: []u8, alignment: std.mem.Alignment, new_len: usize, ret_addr: usize) ?[*]u8 {
     var self: *CountingAllocator = @ptrCast(@alignCast(ctx));
+    self.count_remaps += 1;
     const memory_new = self.child_allocator.rawRemap(memory, alignment, new_len, ret_addr) orelse return null;
-    if (memory_new != memory.ptr) self.count_active -= memory.len;
-    if (memory_new != memory.ptr) self.count_active += new_len;
+    self.count_active -= memory.len;
+    self.count_active += new_len;
     return memory_new;
 }
 
