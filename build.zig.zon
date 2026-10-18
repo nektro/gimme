@@ -1,0 +1,8 @@
+.{
+    .name = .gimme,
+    .version = "0.0.1",
+    .dependencies = .{},
+    .minimum_zig_version = "0.17.0",
+    .paths = .{""},
+    .fingerprint = 0x69a3c8729ee20ac,
+}
